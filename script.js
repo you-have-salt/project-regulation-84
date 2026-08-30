@@ -1,40 +1,82 @@
-/* ==========================================
-   1. 音效控制 (Web Audio & 自訂路徑)
-   ========================================== */
 const audioConfig = {
   click: './sounds/click.mp3',
   keypress: './sounds/keypress.mp3',
   success: './sounds/success.mp3',
   error: './sounds/error.mp3'
 };
-
+const audioVolumeConfig = {
+  click: 0.3,
+  keypress: 0.1,
+  success: 0.8,
+  error: 0.2,
+  bgm: 0.2
+};
 let isMuted = localStorage.getItem('arg_terminal_muted') === 'true';
-
+let bgmStarted = false;
+const activeAudioPool = {};
 function playSound(type) {
   if (isMuted || !audioConfig[type]) return;
-  const audio = new Audio(audioConfig[type]);
-  audio.play().catch(() => {
-  });
-}
 
+  try {
+    if (activeAudioPool[type]) {
+      activeAudioPool[type].currentTime = 0;
+      activeAudioPool[type].play().catch(() => {});
+      return;
+    }
+    const audio = new Audio(audioConfig[type]);
+    audio.volume = audioVolumeConfig[type] !== undefined ? audioVolumeConfig[type] : 0.1;
+    activeAudioPool[type] = audio;
+    audio.play().catch(() => {});
+    audio.onended = () => {
+      delete activeAudioPool[type];
+    };
+  } catch (err) {
+  }
+}
+function initBGM() {
+  const bgm = document.getElementById('bgmAudio');
+  if (!bgm) return;
+  bgm.volume = audioVolumeConfig.bgm || 0.2;
+  const playBGM = () => {
+    if (!isMuted && bgm.paused) {
+      bgm.play().then(() => {
+        bgmStarted = true;
+      }).catch(() => {});
+    }
+  };
+  playBGM();
+  const handleFirstInteraction = () => {
+    if (!bgmStarted && !isMuted) {
+      playBGM();
+    }
+  };
+  document.addEventListener('click', handleFirstInteraction, { once: true });
+  document.addEventListener('keydown', handleFirstInteraction, { once: true });
+}
 function toggleAudio() {
   isMuted = !isMuted;
   localStorage.setItem('arg_terminal_muted', isMuted);
+  const bgm = document.getElementById('bgmAudio');
+  if (bgm) {
+    if (isMuted) {
+      bgm.pause();
+    } else {
+      bgm.play().catch(() => {});
+    }
+  }
   updateAudioButtonUI();
 }
-
 function updateAudioButtonUI() {
   const btn = document.getElementById('audio-toggle-btn');
   if (!btn) return;
   if (isMuted) {
-    btn.textContent = 'AUDIO';
+    btn.textContent = 'AUDIO: OFF';
     btn.classList.add('muted');
   } else {
-    btn.textContent = 'AUDIO';
+    btn.textContent = 'AUDIO: ON';
     btn.classList.remove('muted');
   }
 }
-
 /* ==========================================
    2. 關卡資料庫在這
    ========================================== */
@@ -100,10 +142,6 @@ const levelDatabase = [
     }
   }
 ];
-
-/* ==========================================
-   3. 狀態管理 (State Management)
-   ========================================== */
 let currentLevelIndex = 0;
 
 function loadProgress() {
@@ -121,7 +159,7 @@ function saveProgress() {
 }
 
 /* ==========================================
-   4. 開場動畫 (Boot Loader)
+   開場動畫
    ========================================== */
 function startLoadingAnimation() {
   const loader = document.getElementById('boot-loader');
@@ -150,11 +188,8 @@ function startLoadingAnimation() {
       percentText.style.color = 'var(--accent-green)';
       statusText.textContent = 'DECRYPTION COMPLETE. ACCESS GRANTED.';
       statusText.style.color = 'var(--accent-green)';
-
-      // 到達 100% 切換圖片
       img.src = imageCompleted;
       playSound('success');
-
       setTimeout(() => {
         loader.classList.add('fade-out');
       }, 1200);
@@ -165,22 +200,17 @@ function startLoadingAnimation() {
   }, 60);
 }
 
-/* ==========================================
-   5. 頁面渲染與遊戲邏輯
-   ========================================== */
 document.addEventListener('DOMContentLoaded', () => {
   loadProgress();
   updateAudioButtonUI();
   startLoadingAnimation();
-
+  initBGM();
   const audioBtn = document.getElementById('audio-toggle-btn');
   if (audioBtn) {
     audioBtn.addEventListener('click', toggleAudio);
   }
-
   const executeBtn = document.getElementById('execute-btn');
   const cmdInput = document.getElementById('terminal-input');
-
   executeBtn.addEventListener('click', handleExecute);
   cmdInput.addEventListener('keydown', (e) => {
     playSound('keypress');
@@ -188,22 +218,15 @@ document.addEventListener('DOMContentLoaded', () => {
       handleExecute();
     }
   });
-
   renderUI();
 });
-
 function renderUI() {
   const currentData = levelDatabase[currentLevelIndex];
-  
-  // 更新 Clearance 顯示
   const clearanceBadge = document.getElementById('current-clearance');
   const formattedLevel = String(currentData.level).padStart(2, '0');
   clearanceBadge.textContent = `CLEARANCE: LEVEL ${formattedLevel}`;
-
-  // 控制輸入框開關
   const cmdInput = document.getElementById('terminal-input');
   const executeBtn = document.getElementById('execute-btn');
-
   if (!currentData.isReleased) {
     cmdInput.disabled = true;
     executeBtn.disabled = true;
@@ -213,32 +236,21 @@ function renderUI() {
     executeBtn.disabled = false;
     cmdInput.placeholder = `請在此輸入 LEVEL ${formattedLevel} 解鎖指令...`;
   }
-
   renderCluesList();
 }
-
 function handleExecute() {
   const cmdInput = document.getElementById('terminal-input');
   const inputVal = cmdInput.value.trim();
   if (!inputVal) return;
-
   const consoleOutput = document.getElementById('console-output');
   const currentData = levelDatabase[currentLevelIndex];
-
-  // 印出玩家輸入的指令
   appendConsoleLog(`> ${inputVal}`, 'system');
-
   const isCorrect = currentData.passcodes.some(code => code.toLowerCase() === inputVal.toLowerCase());
-
   if (isCorrect) {
     playSound('success');
     appendConsoleLog(`[SUCCESS] 存取授權成功！已解開 LEVEL ${String(currentData.level).padStart(2, '0')} 密鑰`, 'success');
     cmdInput.value = '';
-
-    // 自動開啟通關獎勵
     openRewardModal(currentLevelIndex);
-
-    // 進階下一關
     if (currentLevelIndex < levelDatabase.length - 1) {
       currentLevelIndex++;
       saveProgress();
@@ -250,10 +262,8 @@ function handleExecute() {
     playSound('error');
     appendConsoleLog(`ERROR 金鑰錯誤或權限不足，請重新驗證指令`, 'error');
   }
-
   consoleOutput.scrollTop = consoleOutput.scrollHeight;
 }
-
 function appendConsoleLog(text, type) {
   const consoleOutput = document.getElementById('console-output');
   const entry = document.createElement('div');
@@ -261,19 +271,15 @@ function appendConsoleLog(text, type) {
   entry.textContent = text;
   consoleOutput.appendChild(entry);
 }
-
 function renderCluesList() {
   const container = document.getElementById('clues-container');
   container.innerHTML = '';
-
   levelDatabase.forEach((lvl, index) => {
     if (index > currentLevelIndex && !lvl.isReleased) return;
-
     const card = document.createElement('div');
     let statusClass = '';
     let statusBadgeText = '';
     let statusBadgeColor = '';
-
     if (index < currentLevelIndex) {
       statusClass = 'cleared';
       statusBadgeText = 'CLEAR';
@@ -289,9 +295,7 @@ function renderCluesList() {
         statusBadgeColor = 'yellow';
       }
     }
-
     card.className = `clue-card ${statusClass}`;
-    
     let actionsHTML = '';
     if (lvl.isReleased) {
       actionsHTML += `<button class="action-btn view-clue-btn" onclick="openClueModal(${index})">代碼提示</button>`;
@@ -299,7 +303,6 @@ function renderCluesList() {
     if (index < currentLevelIndex) {
       actionsHTML += `<button class="action-btn view-reward-btn" onclick="openRewardModal(${index})">已解線索</button>`;
     }
-
     card.innerHTML = `
       <div class="clue-card-header">
         <div class="clue-title-group">
@@ -318,9 +321,6 @@ function renderCluesList() {
   });
 }
 
-/* ==========================================
-   6. Modal 控制
-   ========================================== */
 function openClueModal(index) {
   playSound('click');
   const lvl = levelDatabase[index];
@@ -328,46 +328,37 @@ function openClueModal(index) {
   document.getElementById('modal-clue-text').textContent = lvl.clueText;
   document.getElementById('clue-modal').classList.add('active');
 }
-
 function closeClueModal() {
   playSound('click');
   document.getElementById('clue-modal').classList.remove('active');
 }
-
 function openRewardModal(index) {
   playSound('click');
   const lvl = levelDatabase[index];
   const reward = lvl.reward;
-
   document.getElementById('reward-modal-title').textContent = `${reward.title}`;
   document.getElementById('reward-text-content').textContent = reward.text;
-
   const mediaContainer = document.getElementById('reward-media-container');
   mediaContainer.innerHTML = '';
-
   if (reward.imageUrl) {
     const img = document.createElement('img');
     img.src = reward.imageUrl;
     mediaContainer.appendChild(img);
   }
-
   if (reward.audioUrl) {
     const audio = document.createElement('audio');
     audio.controls = true;
     audio.src = reward.audioUrl;
     mediaContainer.appendChild(audio);
   }
-
   if (reward.videoUrl) {
     const video = document.createElement('video');
     video.controls = true;
     video.src = reward.videoUrl;
     mediaContainer.appendChild(video);
   }
-
   document.getElementById('reward-modal').classList.add('active');
 }
-
 function closeRewardModal() {
   playSound('click');
   document.getElementById('reward-modal').classList.remove('active');

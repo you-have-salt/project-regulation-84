@@ -7,27 +7,19 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="crt-screen">
-
-  <!-- 1. 開場載入動畫畫面 (Loading Screen) -->
   <div id="boot-loader" class="boot-loader-overlay">
     <div class="boot-box">
       <div class="boot-header">SYSTEM BOOT SEQUENCE</div>
-      
-      <!-- 動態轉換圖片區塊 -->
       <div class="boot-image-container">
         <img id="boot-img" src="./images/logo1.PNG" alt="Boot Image" />
       </div>
-
       <div class="boot-status" id="boot-status-text">INITIALIZING QUANTUM ENCRYPTION...</div>
-      
-      <!-- 進度條 -->
       <div class="progress-bar-border">
         <div class="progress-bar-fill" id="boot-progress-fill"></div>
       </div>
       <div class="progress-percentage" id="boot-percentage">0%</div>
     </div>
   </div>
-
   <div class="container">
     <header class="terminal-header">
       <div class="logo-group">
@@ -40,7 +32,6 @@
         </svg>
         <span class="system-title">ARG // Project Regulation 84</span>
       </div>
-      
       <div class="status-group">
         <a href="https://www.instagram.com/project_regulation_84" target="_blank" class="instagram-btn" title="前往官方 Instagram 查看新線索">
           <svg class="ig-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -54,7 +45,6 @@
         <button id="audio-toggle-btn" class="audio-btn">AUDIO: ON</button>
       </div>
     </header>
-
     <main class="terminal-grid">
       <section class="panel full-width">
         <div class="panel-header">
@@ -108,7 +98,7 @@
       </div>
     </div>
   </div>
-
+    <audio id="bgmAudio" loop preload="auto" src="./sounds/bgm.mp3"></audio>
   <script src="script.js"></script>
 </body>
 </html>
