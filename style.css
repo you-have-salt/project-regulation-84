@@ -1,0 +1,523 @@
+/* ==========================================
+   1. 基礎設定 & 變數 (RWD 現代化)
+   ========================================== */
+:root {
+  --bg-color: #0d1117;
+  --panel-bg: #161b22;
+  --panel-border: #30363d;
+  --text-main: #c9d1d9;
+  --accent-red: #ff5555;
+  --accent-green: #50fa7b;
+  --accent-yellow: #f1fa8c;
+  --accent-cyan: #8be9fd;
+  --accent-purple: #bd93f9;
+  --font-mono: "Courier New", Courier, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 避免行動裝置橫向滾動條與雙擊放大延遲 */
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+  touch-action: manipulation;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  line-height: 1.5;
+  min-height: 100vh;
+  padding: 12px; /* 手機端預設較小邊距 */
+}
+
+/* CRT 螢幕復古效果 (手機端降低不透明度確保清晰) */
+.crt-screen::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* ==========================================
+   2. 開場載入畫面 (Boot Loader RWD)
+   ========================================== */
+.boot-loader-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background-color: #05070a;
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.boot-loader-overlay.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.boot-box {
+  width: 100%;
+  max-width: 480px;
+  border: 1px solid var(--accent-cyan);
+  background: #0d1117;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(139, 233, 253, 0.2);
+}
+
+.boot-header {
+  color: var(--accent-cyan);
+  font-weight: bold;
+  font-size: clamp(0.9rem, 4vw, 1.1rem);
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.boot-image-container {
+  width: 100%;
+  height: clamp(160px, 35vh, 240px); /* 動態高度自適應手機螢幕 */
+  background: #000;
+  border: 1px solid var(--panel-border);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.boot-image-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.boot-status {
+  color: var(--text-main);
+  font-size: clamp(0.75rem, 3vw, 0.85rem);
+  margin-bottom: 10px;
+  min-height: 20px;
+  word-break: break-word;
+}
+
+.progress-bar-border {
+  width: 100%;
+  height: 14px;
+  border: 1px solid var(--accent-cyan);
+  padding: 2px;
+  background: #000;
+  margin-bottom: 6px;
+}
+
+.progress-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--accent-cyan);
+  transition: width 0.1s linear, background-color 0.3s ease;
+}
+
+.progress-percentage {
+  color: var(--accent-cyan);
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+/* ==========================================
+   3. 頁頭 (Header RWD 流體排版)
+   ========================================== */
+.container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.terminal-header {
+  display: flex;
+  flex-direction: column; /* 手機預設直向排列 */
+  gap: 12px;
+  border: 1px solid var(--panel-border);
+  background-color: var(--panel-bg);
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--accent-cyan);
+  flex-shrink: 0;
+}
+
+.system-title {
+  font-weight: bold;
+  color: var(--accent-cyan);
+  font-size: clamp(0.85rem, 3.5vw, 1rem);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-group {
+  display: flex;
+  flex-wrap: wrap; /* 自動換行適應窄螢幕 */
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.instagram-btn, .audio-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 2px;
+  min-height: 32px; /* Touch 目標優化 */
+}
+
+.instagram-btn {
+  background: rgba(225, 48, 108, 0.15);
+  border: 1px solid #e1306c;
+  color: #ff75a0;
+}
+
+.ig-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.audio-btn {
+  background: rgba(80, 250, 123, 0.1);
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+}
+
+.audio-btn.muted {
+  background: rgba(255, 85, 85, 0.1);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.clearance-badge {
+  background: rgba(241, 250, 140, 0.1);
+  border: 1px solid var(--accent-yellow);
+  color: var(--accent-yellow);
+  font-size: 0.7rem;
+  padding: 6px 8px;
+  font-weight: bold;
+}
+
+/* ==========================================
+   4. 面板與終端控制台 (Terminal Input RWD)
+   ========================================== */
+.terminal-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel {
+  border: 1px solid var(--panel-border);
+  background-color: var(--panel-bg);
+  width: 100%;
+}
+
+.panel-header {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.panel-title {
+  font-size: 0.8rem;
+  color: var(--text-main);
+  font-weight: bold;
+}
+
+.panel-body {
+  padding: 12px;
+}
+
+.terminal-input-group {
+  display: flex;
+  flex-direction: column; /* 手機端自動拉長為上下排列 */
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.prompt-symbol {
+  display: none; /* 手機端隱藏前導符號節省空間 */
+}
+
+.cmd-input {
+  width: 100%;
+  background: #000;
+  border: 1px solid var(--panel-border);
+  color: var(--accent-green);
+  font-family: var(--font-mono);
+  padding: 10px;
+  font-size: 0.9rem;
+  outline: none;
+  border-radius: 0;
+}
+
+.cmd-input:focus {
+  border-color: var(--accent-green);
+}
+
+.action-btn {
+  width: 100%;
+  background: #21262d;
+  border: 1px solid var(--panel-border);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  padding: 6px 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.execute-btn {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+}
+
+.console-box {
+  background: #000;
+  border: 1px solid var(--panel-border);
+  padding: 10px;
+  min-height: 80px;
+  max-height: 160px;
+  overflow-y: auto;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  word-break: break-all;
+}
+
+.log-entry.system { color: #8b949e; }
+.log-entry.success { color: var(--accent-green); font-weight: bold; }
+.log-entry.error { color: var(--accent-red); }
+
+.clues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.clue-card {
+  background: #0d1117;
+  border: 1px solid var(--panel-border);
+  border-left: 4px solid var(--panel-border);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.clue-card.active { border-left-color: var(--accent-red); }
+.clue-card.cleared { border-left-color: var(--accent-green); }
+.clue-card.locked { border-left-color: var(--accent-yellow); opacity: 0.7; }
+
+.clue-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+
+.clue-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.clue-level-tag {
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  background: #21262d;
+  color: var(--accent-cyan);
+}
+
+.clue-card-title {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.status-badge {
+  font-size: 0.7rem;
+  padding: 3px 7px;
+  font-weight: bold;
+}
+
+.status-badge.red { color: var(--accent-red); border: 1px solid var(--accent-red); }
+.status-badge.green { color: var(--accent-green); border: 1px solid var(--accent-green); }
+.status-badge.yellow { color: var(--accent-yellow); border: 1px solid var(--accent-yellow); }
+
+.clue-card-body p {
+  font-size: 0.8rem;
+  color: #8b949e;
+}
+
+.clue-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-box {
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel-bg);
+  border: 1px solid var(--accent-cyan);
+  box-shadow: 0 0 20px rgba(139, 233, 253, 0.15);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 12px;
+}
+
+.modal-title {
+  color: var(--accent-cyan);
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.modal-body {
+  padding: 14px;
+  overflow-y: auto;
+  word-break: break-word;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--panel-border);
+  padding: 10px 12px;
+}
+
+.clue-detail-text, .reward-text {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.reward-media-container {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reward-media-container img, .reward-media-container video {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--panel-border);
+}
+@media (min-width: 600px) {
+  body {
+    padding: 20px;
+  }
+
+  /* 平板以上 Header 橫向切換 */
+  .terminal-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .status-group {
+    width: auto;
+    justify-content: flex-end;
+  }
+  .terminal-input-group {
+    flex-direction: row;
+  }
+
+  .prompt-symbol {
+    display: inline-block;
+  }
+
+  .action-btn {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  /* 卡片頭部左右對齊 */
+  .clue-card-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .clue-card-actions {
+    flex-direction: row;
+  }
+  ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.console-box, .modal-body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.console-box::-webkit-scrollbar, 
+.modal-body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+}

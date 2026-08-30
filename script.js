@@ -1,0 +1,374 @@
+/* ==========================================
+   1. 音效控制 (Web Audio & 自訂路徑)
+   ========================================== */
+const audioConfig = {
+  click: './sounds/click.mp3',
+  keypress: './sounds/keypress.mp3',
+  success: './sounds/success.mp3',
+  error: './sounds/error.mp3'
+};
+
+let isMuted = localStorage.getItem('arg_terminal_muted') === 'true';
+
+function playSound(type) {
+  if (isMuted || !audioConfig[type]) return;
+  const audio = new Audio(audioConfig[type]);
+  audio.play().catch(() => {
+  });
+}
+
+function toggleAudio() {
+  isMuted = !isMuted;
+  localStorage.setItem('arg_terminal_muted', isMuted);
+  updateAudioButtonUI();
+}
+
+function updateAudioButtonUI() {
+  const btn = document.getElementById('audio-toggle-btn');
+  if (!btn) return;
+  if (isMuted) {
+    btn.textContent = 'AUDIO: OFF';
+    btn.classList.add('muted');
+  } else {
+    btn.textContent = 'AUDIO: ON';
+    btn.classList.remove('muted');
+  }
+}
+
+/* ==========================================
+   2. 關卡資料庫在這
+   ========================================== */
+const levelDatabase = [
+  {
+    level: 1,
+    title: "黑暗中閃爍的綠光",
+    summary: "一台需要授權的電腦，解開終端金鑰以獲取初步權限",
+    clueText: "觀察社群貼文中發布的神秘畫面\n提示：便利貼的英文和虛線是否與畫面有關聯?\n嘗試著由左到右串聯起來吧",
+    passcodes: ["unlock 81230", "81230"],
+    isReleased: true,
+    reward: {
+      title: "報告：機密檔案已開啟",
+      text: "【系統警告】\n授權成功\n你發現了一張看似員工手冊條規說明的圖片\n其中畫面上重要的內容被塗黑了",
+      imageUrl: "./images/level1.png",
+      audioUrl: "",
+      videoUrl: ""
+    }
+  },
+  {
+    level: 2,
+    title: "非日常籌備",
+    summary: "一張貼在牆上的海報，尋找隱藏在圖片中的密碼。",
+    clueText: "觀察社群貼文中發布的海報\n提示：便利貼的英文和虛線是否與畫面有關聯?\n嘗試著由左到右串聯起來吧",
+    passcodes: ["unlock ECHO88", "ECHO88"],
+    isReleased: true,
+    reward: {
+      title: "報告：機密檔案已開啟",
+      text: "【廣播截獲】訊號頻率已鎖定，成功獲取秘密音檔",
+      imageUrl: "",
+      audioUrl: "",
+      videoUrl: ""
+    }
+  },
+  {
+    level: 3,
+    title: "除舊換新",
+    summary: "最後的防火牆阻擋了去路，拼湊所有舊線索解開總機密。",
+    clueText: "【機密線索 #03】\n將所有過關獲得的關鍵字組合成最終金鑰。",
+    passcodes: ["unlock MATRIX999", "MATRIX999"],
+    isReleased: false,
+    reward: {
+      title: "報告：機密檔案已開啟",
+      text: "【恭喜通關】你已完成全數關卡，解開最終迷局！",
+      imageUrl: "",
+      audioUrl: "",
+      videoUrl: ""
+    }
+  },
+    {
+    level: 4,
+    title: "第三階段：終極協定",
+    summary: "最後的防火牆阻擋了去路，拼湊所有舊線索解開總機密。",
+    clueText: "【機密線索 #03】\n將所有過關獲得的關鍵字組合成最終金鑰。",
+    passcodes: ["unlock MATRIX999", "MATRIX999"],
+    isReleased: false,
+    reward: {
+      title: "第三階段：通關機密檔案",
+      text: "【恭喜通關】你已完成全數關卡，解開最終迷局！",
+      imageUrl: "",
+      audioUrl: "",
+      videoUrl: ""
+    }
+  }
+];
+
+/* ==========================================
+   3. 狀態管理 (State Management)
+   ========================================== */
+let currentLevelIndex = 0;
+
+function loadProgress() {
+  const savedLevel = localStorage.getItem('arg_current_level');
+  if (savedLevel !== null) {
+    currentLevelIndex = parseInt(savedLevel, 10);
+    if (currentLevelIndex >= levelDatabase.length) {
+      currentLevelIndex = levelDatabase.length - 1;
+    }
+  }
+}
+
+function saveProgress() {
+  localStorage.setItem('arg_current_level', currentLevelIndex);
+}
+
+/* ==========================================
+   4. 開場動畫 (Boot Loader)
+   ========================================== */
+function startLoadingAnimation() {
+  const loader = document.getElementById('boot-loader');
+  const img = document.getElementById('boot-img');
+  const fill = document.getElementById('boot-progress-fill');
+  const percentText = document.getElementById('boot-percentage');
+  const statusText = document.getElementById('boot-status-text');
+
+  // 可替換成你自己的圖片檔案路徑
+  const imageInitial = "./images/logo1.png";
+  const imageCompleted = "./images/logo2.png";
+
+  let progress = 0;
+  img.src = imageInitial;
+
+  const interval = setInterval(() => {
+    progress += Math.floor(Math.random() * 5) + 2;
+
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(interval);
+
+      fill.style.width = '100%';
+      fill.style.backgroundColor = 'var(--accent-green)';
+      percentText.textContent = '100%';
+      percentText.style.color = 'var(--accent-green)';
+      statusText.textContent = 'DECRYPTION COMPLETE. ACCESS GRANTED.';
+      statusText.style.color = 'var(--accent-green)';
+
+      // 到達 100% 切換圖片
+      img.src = imageCompleted;
+      playSound('success');
+
+      setTimeout(() => {
+        loader.classList.add('fade-out');
+      }, 1200);
+    } else {
+      fill.style.width = progress + '%';
+      percentText.textContent = progress + '%';
+    }
+  }, 60);
+}
+
+/* ==========================================
+   5. 頁面渲染與遊戲邏輯
+   ========================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  loadProgress();
+  updateAudioButtonUI();
+  startLoadingAnimation();
+
+  const audioBtn = document.getElementById('audio-toggle-btn');
+  if (audioBtn) {
+    audioBtn.addEventListener('click', toggleAudio);
+  }
+
+  const executeBtn = document.getElementById('execute-btn');
+  const cmdInput = document.getElementById('terminal-input');
+
+  executeBtn.addEventListener('click', handleExecute);
+  cmdInput.addEventListener('keydown', (e) => {
+    playSound('keypress');
+    if (e.key === 'Enter') {
+      handleExecute();
+    }
+  });
+
+  renderUI();
+});
+
+function renderUI() {
+  const currentData = levelDatabase[currentLevelIndex];
+  
+  // 更新 Clearance 顯示
+  const clearanceBadge = document.getElementById('current-clearance');
+  const formattedLevel = String(currentData.level).padStart(2, '0');
+  clearanceBadge.textContent = `CLEARANCE: LEVEL ${formattedLevel}`;
+
+  // 控制輸入框開關
+  const cmdInput = document.getElementById('terminal-input');
+  const executeBtn = document.getElementById('execute-btn');
+
+  if (!currentData.isReleased) {
+    cmdInput.disabled = true;
+    executeBtn.disabled = true;
+    cmdInput.placeholder = "系統鎖定：靜待官方社群公布最新線索";
+  } else {
+    cmdInput.disabled = false;
+    executeBtn.disabled = false;
+    cmdInput.placeholder = `請在此輸入 LEVEL ${formattedLevel} 解鎖指令...`;
+  }
+
+  renderCluesList();
+}
+
+function handleExecute() {
+  const cmdInput = document.getElementById('terminal-input');
+  const inputVal = cmdInput.value.trim();
+  if (!inputVal) return;
+
+  const consoleOutput = document.getElementById('console-output');
+  const currentData = levelDatabase[currentLevelIndex];
+
+  // 印出玩家輸入的指令
+  appendConsoleLog(`> ${inputVal}`, 'system');
+
+  const isCorrect = currentData.passcodes.some(code => code.toLowerCase() === inputVal.toLowerCase());
+
+  if (isCorrect) {
+    playSound('success');
+    appendConsoleLog(`[SUCCESS] 存取授權成功！已解開 LEVEL ${String(currentData.level).padStart(2, '0')} 密鑰`, 'success');
+    cmdInput.value = '';
+
+    // 自動開啟通關獎勵
+    openRewardModal(currentLevelIndex);
+
+    // 進階下一關
+    if (currentLevelIndex < levelDatabase.length - 1) {
+      currentLevelIndex++;
+      saveProgress();
+      renderUI();
+    } else {
+      appendConsoleLog(`ALL CLEARED 你已破譯所有已知層級的終端協定！`, 'success');
+    }
+  } else {
+    playSound('error');
+    appendConsoleLog(`ERROR 金鑰錯誤或權限不足，請重新驗證指令`, 'error');
+  }
+
+  consoleOutput.scrollTop = consoleOutput.scrollHeight;
+}
+
+function appendConsoleLog(text, type) {
+  const consoleOutput = document.getElementById('console-output');
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  entry.textContent = text;
+  consoleOutput.appendChild(entry);
+}
+
+function renderCluesList() {
+  const container = document.getElementById('clues-container');
+  container.innerHTML = '';
+
+  levelDatabase.forEach((lvl, index) => {
+    if (index > currentLevelIndex && !lvl.isReleased) return;
+
+    const card = document.createElement('div');
+    let statusClass = '';
+    let statusBadgeText = '';
+    let statusBadgeColor = '';
+
+    if (index < currentLevelIndex) {
+      statusClass = 'cleared';
+      statusBadgeText = 'CLEAR';
+      statusBadgeColor = 'green';
+    } else if (index === currentLevelIndex) {
+      if (lvl.isReleased) {
+        statusClass = 'active';
+        statusBadgeText = 'ACT';
+        statusBadgeColor = 'red';
+      } else {
+        statusClass = 'locked';
+        statusBadgeText = 'LOCK';
+        statusBadgeColor = 'yellow';
+      }
+    }
+
+    card.className = `clue-card ${statusClass}`;
+    
+    let actionsHTML = '';
+    if (lvl.isReleased) {
+      actionsHTML += `<button class="action-btn view-clue-btn" onclick="openClueModal(${index})">代碼提示</button>`;
+    }
+    if (index < currentLevelIndex) {
+      actionsHTML += `<button class="action-btn view-reward-btn" onclick="openRewardModal(${index})">已解線索</button>`;
+    }
+
+    card.innerHTML = `
+      <div class="clue-card-header">
+        <div class="clue-title-group">
+          <span class="clue-level-tag">LEVEL ${String(lvl.level).padStart(2, '0')}</span>
+          <span class="clue-card-title">${lvl.title}</span>
+        </div>
+        <span class="status-badge ${statusBadgeColor}">${statusBadgeText}</span>
+      </div>
+      <div class="clue-card-body">
+        <p>${lvl.summary}</p>
+      </div>
+      ${actionsHTML ? `<div class="clue-card-actions">${actionsHTML}</div>` : ''}
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+/* ==========================================
+   6. Modal 控制
+   ========================================== */
+function openClueModal(index) {
+  playSound('click');
+  const lvl = levelDatabase[index];
+  document.getElementById('modal-clue-title').textContent = `LEVEL ${String(lvl.level).padStart(2, '0')} 機密線索`;
+  document.getElementById('modal-clue-text').textContent = lvl.clueText;
+  document.getElementById('clue-modal').classList.add('active');
+}
+
+function closeClueModal() {
+  playSound('click');
+  document.getElementById('clue-modal').classList.remove('active');
+}
+
+function openRewardModal(index) {
+  playSound('click');
+  const lvl = levelDatabase[index];
+  const reward = lvl.reward;
+
+  document.getElementById('reward-modal-title').textContent = `${reward.title}`;
+  document.getElementById('reward-text-content').textContent = reward.text;
+
+  const mediaContainer = document.getElementById('reward-media-container');
+  mediaContainer.innerHTML = '';
+
+  if (reward.imageUrl) {
+    const img = document.createElement('img');
+    img.src = reward.imageUrl;
+    mediaContainer.appendChild(img);
+  }
+
+  if (reward.audioUrl) {
+    const audio = document.createElement('audio');
+    audio.controls = true;
+    audio.src = reward.audioUrl;
+    mediaContainer.appendChild(audio);
+  }
+
+  if (reward.videoUrl) {
+    const video = document.createElement('video');
+    video.controls = true;
+    video.src = reward.videoUrl;
+    mediaContainer.appendChild(video);
+  }
+
+  document.getElementById('reward-modal').classList.add('active');
+}
+
+function closeRewardModal() {
+  playSound('click');
+  document.getElementById('reward-modal').classList.remove('active');
+}

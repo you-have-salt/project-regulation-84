@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Regulation 84</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="crt-screen">
+
+  <!-- 1. 開場載入動畫畫面 (Loading Screen) -->
+  <div id="boot-loader" class="boot-loader-overlay">
+    <div class="boot-box">
+      <div class="boot-header">SYSTEM BOOT SEQUENCE</div>
+      
+      <!-- 動態轉換圖片區塊 -->
+      <div class="boot-image-container">
+        <img id="boot-img" src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80" alt="Boot Image" />
+      </div>
+
+      <div class="boot-status" id="boot-status-text">INITIALIZING QUANTUM ENCRYPTION...</div>
+      
+      <!-- 進度條 -->
+      <div class="progress-bar-border">
+        <div class="progress-bar-fill" id="boot-progress-fill"></div>
+      </div>
+      <div class="progress-percentage" id="boot-percentage">0%</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header class="terminal-header">
+      <div class="logo-group">
+        <svg class="terminal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="0"></rect>
+          <path d="M8 21h8"></path>
+          <path d="M12 17v4"></path>
+          <path d="M7 8l4 4-4 4"></path>
+          <path d="M13 16h4"></path>
+        </svg>
+        <span class="system-title">ARG // Project Regulation 84</span>
+      </div>
+      
+      <div class="status-group">
+        <a href="https://www.instagram.com/project_regulation_84" target="_blank" class="instagram-btn" title="前往官方 Instagram 查看新線索">
+          <svg class="ig-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+          INSTAGRAM
+        </a>
+        <span class="clearance-badge" id="current-clearance">CLEARANCE: LEVEL 01</span>
+        <button id="audio-toggle-btn" class="audio-btn">AUDIO: ON</button>
+      </div>
+    </header>
+
+    <main class="terminal-grid">
+      <section class="panel full-width">
+        <div class="panel-header">
+          <span class="panel-title">終端控制台</span>
+        </div>
+        <div class="panel-body">
+          <div class="terminal-input-group">
+            <input type="text" id="terminal-input" class="cmd-input" placeholder="請在此輸入解鎖指令" autocomplete="off" />
+            <button class="action-btn execute-btn" id="execute-btn">ENTER</button>
+          </div>
+          <div class="console-box" id="console-output">
+            <div class="log-entry system">&gt; 請從下方線索取得密鑰，並輸入解鎖指令...</div>
+          </div>
+        </div>
+      </section>
+      <section class="panel full-width">
+        <div class="panel-header">
+          <span class="panel-title">檔案庫</span>
+        </div>
+        <div class="panel-body">
+          <div class="clues-list" id="clues-container">
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="modal-overlay" id="clue-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-clue-title">機密檔案內容</span>
+      </div>
+      <div class="modal-body">
+        <div id="modal-clue-text" class="clue-detail-text"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn close-btn" onclick="closeClueModal()">關閉檔案</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="reward-modal">
+    <div class="modal-box reward-box">
+      <div class="modal-header">
+        <span class="modal-title" id="reward-modal-title">已授權</span>
+      </div>
+      <div class="modal-body">
+        <div id="reward-text-content" class="reward-text"></div>
+        <div id="reward-media-container" class="reward-media-container"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn close-btn" onclick="closeRewardModal()">關閉檔案</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
