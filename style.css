@@ -74,7 +74,7 @@ body {
   max-width: 480px;
   border: 1px solid var(--accent-cyan);
   background: #0d1117;
-  padding: 16px;
+  padding: 12px;
   text-align: center;
   box-shadow: 0 0 20px rgba(139, 233, 253, 0.2);
 }
@@ -92,7 +92,7 @@ body {
   height: clamp(160px, 35vh, 240px); /* 動態高度自適應手機螢幕 */
   background: #000;
   border: 1px solid var(--panel-border);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -27,10 +27,10 @@ function updateAudioButtonUI() {
   const btn = document.getElementById('audio-toggle-btn');
   if (!btn) return;
   if (isMuted) {
-    btn.textContent = 'AUDIO: OFF';
+    btn.textContent = 'AUDIO';
     btn.classList.add('muted');
   } else {
-    btn.textContent = 'AUDIO: ON';
+    btn.textContent = 'AUDIO';
     btn.classList.remove('muted');
   }
 }
@@ -57,10 +57,10 @@ const levelDatabase = [
   {
     level: 2,
     title: "非日常籌備",
-    summary: "一張貼在牆上的海報，尋找隱藏在圖片中的密碼。",
+    summary: "一張更換物件的單子",
     clueText: "觀察社群貼文中發布的海報\n提示：便利貼的英文和虛線是否與畫面有關聯?\n嘗試著由左到右串聯起來吧",
     passcodes: ["unlock ECHO88", "ECHO88"],
-    isReleased: true,
+    isReleased: false,
     reward: {
       title: "報告：機密檔案已開啟",
       text: "【廣播截獲】訊號頻率已鎖定，成功獲取秘密音檔",
@@ -131,8 +131,8 @@ function startLoadingAnimation() {
   const statusText = document.getElementById('boot-status-text');
 
   // 可替換成你自己的圖片檔案路徑
-  const imageInitial = "./images/logo1.png";
-  const imageCompleted = "./images/logo2.png";
+  const imageInitial = "./images/logo1.PNG";
+  const imageCompleted = "./images/logo2.PNG";
 
   let progress = 0;
   img.src = imageInitial;
