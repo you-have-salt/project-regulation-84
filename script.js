@@ -52,6 +52,17 @@ function initBGM() {
   };
   document.addEventListener('click', handleFirstInteraction, { once: true });
   document.addEventListener('keydown', handleFirstInteraction, { once: true });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (!bgm.paused) {
+        bgm.pause();
+      }
+    } else {
+      if (!isMuted && bgmStarted) {
+        bgm.play().catch(() => {});
+      }
+    }
+  });
 }
 function toggleAudio() {
   isMuted = !isMuted;
