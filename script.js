@@ -70,10 +70,10 @@ function updateAudioButtonUI() {
   const btn = document.getElementById('audio-toggle-btn');
   if (!btn) return;
   if (isMuted) {
-    btn.textContent = 'AUDIO: OFF';
+    btn.textContent = 'AUDIO';
     btn.classList.add('muted');
   } else {
-    btn.textContent = 'AUDIO: ON';
+    btn.textContent = 'AUDIO';
     btn.classList.remove('muted');
   }
 }
