@@ -14,6 +14,7 @@ const audioVolumeConfig = {
 let isMuted = localStorage.getItem('arg_terminal_muted') === 'true';
 let bgmStarted = false;
 const activeAudioPool = {};
+
 function playSound(type) {
   if (isMuted || !audioConfig[type]) return;
 
@@ -33,6 +34,7 @@ function playSound(type) {
   } catch (err) {
   }
 }
+
 function initBGM() {
   const bgm = document.getElementById('bgmAudio');
   if (!bgm) return;
@@ -45,12 +47,8 @@ function initBGM() {
     }
   };
   playBGM();
+
   const handleFirstInteraction = () => {
-    if (!bgmStarted && !isMuted) {
-      playBGM();
-    }
-  };
- const handleFirstInteraction = () => {
     if (!bgmStarted && !isMuted) {
       playBGM();
     }
@@ -82,6 +80,7 @@ function initBGM() {
     }
   });
 }
+
 function toggleAudio() {
   isMuted = !isMuted;
   localStorage.setItem('arg_terminal_muted', isMuted);
@@ -95,6 +94,7 @@ function toggleAudio() {
   }
   updateAudioButtonUI();
 }
+
 function updateAudioButtonUI() {
   const btn = document.getElementById('audio-toggle-btn');
   if (!btn) return;
@@ -106,9 +106,7 @@ function updateAudioButtonUI() {
     btn.classList.remove('muted');
   }
 }
-/* ==========================================
-   2. 關卡資料庫在這
-   ========================================== */
+
 const levelDatabase = [
   {
     level: 1,
@@ -155,7 +153,7 @@ const levelDatabase = [
       videoUrl: ""
     }
   },
-    {
+  {
     level: 4,
     title: "第三階段：終極協定",
     summary: "最後的防火牆阻擋了去路，拼湊所有舊線索解開總機密。",
@@ -187,9 +185,6 @@ function saveProgress() {
   localStorage.setItem('arg_current_level', currentLevelIndex);
 }
 
-/* ==========================================
-   開場動畫
-   ========================================== */
 function startLoadingAnimation() {
   const loader = document.getElementById('boot-loader');
   const img = document.getElementById('boot-img');
@@ -202,7 +197,13 @@ function startLoadingAnimation() {
   const imageCompleted = "./images/logo2.PNG";
 
   let progress = 0;
-  img.src = imageInitial;
+  if (img) {
+    img.onerror = function() {
+      this.onerror = null;
+      this.src = 'https://placehold.co/400x200/0d1117/8be9fd?text=PROJECT+REGULATION+84';
+    };
+    img.src = imageInitial;
+  }
 
   const interval = setInterval(() => {
     progress += Math.floor(Math.random() * 5) + 2;
@@ -211,20 +212,28 @@ function startLoadingAnimation() {
       progress = 100;
       clearInterval(interval);
 
-      fill.style.width = '100%';
-      fill.style.backgroundColor = 'var(--accent-green)';
-      percentText.textContent = '100%';
-      percentText.style.color = 'var(--accent-green)';
-      statusText.textContent = 'DECRYPTION COMPLETE. ACCESS GRANTED.';
-      statusText.style.color = 'var(--accent-green)';
-      img.src = imageCompleted;
+      if (fill) {
+        fill.style.width = '100%';
+        fill.style.backgroundColor = 'var(--accent-green)';
+      }
+      if (percentText) {
+        percentText.textContent = '100%';
+        percentText.style.color = 'var(--accent-green)';
+      }
+      if (statusText) {
+        statusText.textContent = 'DECRYPTION COMPLETE. ACCESS GRANTED.';
+        statusText.style.color = 'var(--accent-green)';
+      }
+      if (img) {
+        img.src = imageCompleted;
+      }
       playSound('success');
       setTimeout(() => {
-        loader.classList.add('fade-out');
+        if (loader) loader.classList.add('fade-out');
       }, 1200);
     } else {
-      fill.style.width = progress + '%';
-      percentText.textContent = progress + '%';
+      if (fill) fill.style.width = progress + '%';
+      if (percentText) percentText.textContent = progress + '%';
     }
   }, 60);
 }
@@ -249,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   renderUI();
 });
+
 function renderUI() {
   const currentData = levelDatabase[currentLevelIndex];
   const clearanceBadge = document.getElementById('current-clearance');
@@ -267,6 +277,7 @@ function renderUI() {
   }
   renderCluesList();
 }
+
 function handleExecute() {
   const cmdInput = document.getElementById('terminal-input');
   const inputVal = cmdInput.value.trim();
@@ -293,6 +304,7 @@ function handleExecute() {
   }
   consoleOutput.scrollTop = consoleOutput.scrollHeight;
 }
+
 function appendConsoleLog(text, type) {
   const consoleOutput = document.getElementById('console-output');
   const entry = document.createElement('div');
@@ -300,6 +312,7 @@ function appendConsoleLog(text, type) {
   entry.textContent = text;
   consoleOutput.appendChild(entry);
 }
+
 function renderCluesList() {
   const container = document.getElementById('clues-container');
   container.innerHTML = '';
