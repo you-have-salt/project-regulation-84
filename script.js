@@ -50,8 +50,26 @@ function initBGM() {
       playBGM();
     }
   };
-  document.addEventListener('click', handleFirstInteraction, { once: true });
-  document.addEventListener('keydown', handleFirstInteraction, { once: true });
+ const handleFirstInteraction = () => {
+    if (!bgmStarted && !isMuted) {
+      playBGM();
+    }
+    if (bgmStarted) {
+      removeInteractionListeners();
+    }
+  };
+  const removeInteractionListeners = () => {
+    document.removeEventListener('click', handleFirstInteraction);
+    document.removeEventListener('touchstart', handleFirstInteraction);
+    document.removeEventListener('mousemove', handleFirstInteraction);
+    document.removeEventListener('scroll', handleFirstInteraction);
+    document.removeEventListener('keydown', handleFirstInteraction);
+  };
+  document.addEventListener('click', handleFirstInteraction, { passive: true });
+  document.addEventListener('touchstart', handleFirstInteraction, { passive: true });
+  document.addEventListener('mousemove', handleFirstInteraction, { passive: true });
+  document.addEventListener('scroll', handleFirstInteraction, { passive: true });
+  document.addEventListener('keydown', handleFirstInteraction, { passive: true });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       if (!bgm.paused) {
