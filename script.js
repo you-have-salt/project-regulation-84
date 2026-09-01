@@ -192,7 +192,7 @@ function startLoadingAnimation() {
   const percentText = document.getElementById('boot-percentage');
   const statusText = document.getElementById('boot-status-text');
 
-  // 可替換成你自己的圖片檔案路徑
+
   const imageInitial = "./images/logo1.PNG";
   const imageCompleted = "./images/logo2.PNG";
 
