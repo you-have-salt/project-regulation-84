@@ -118,7 +118,7 @@ const levelDatabase = [
     reward: {
       title: "報告：機密檔案已開啟",
       text: "【系統警告】授權成功\n你發現了一張看似員工手冊條規說明的圖片\n其中畫面上重要的內容被塗黑了",
-      imageUrl: "./images/level1.png",
+      imageUrl: "./images/level1.PNG",
       audioUrl: "",
       videoUrl: ""
     }
@@ -133,7 +133,7 @@ const levelDatabase = [
     reward: {
       title: "報告：機密檔案已開啟",
       text: "【系統警告】授權成功\n一張被撕掉的告示表\n除了內容被塗黑外好像在哪看過它?",
-      imageUrl: "./images/level2.png",
+      imageUrl: "./images/level2.PNG",
       audioUrl: "",
       videoUrl: ""
     }
