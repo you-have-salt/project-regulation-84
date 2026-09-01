@@ -126,14 +126,14 @@ const levelDatabase = [
   {
     level: 2,
     title: "非日常籌備",
-    summary: "一張更換物件的單子",
-    clueText: "觀察社群貼文中發布的海報\n提示：便利貼的英文和虛線是否與畫面有關聯?\n嘗試著由左到右串聯起來吧",
-    passcodes: ["unlock ECHO88", "ECHO88"],
-    isReleased: false,
+    summary: "一張貼在牆上的營運表",
+    clueText: "觀察社群貼文中發布的圖片\n提示：部分數字被圈起來是有什麼目的嗎?\n為什麼有幾串數字的顏色不一樣?",
+    passcodes: ["unlock 63015", "63015"],
+    isReleased: true,
     reward: {
       title: "報告：機密檔案已開啟",
-      text: "【廣播截獲】訊號頻率已鎖定，成功獲取秘密音檔",
-      imageUrl: "",
+      text: "【系統警告】授權成功\n一張被撕掉的告示表\n除了內容被塗黑外好像在哪看過它?",
+      imageUrl: "./images/level2.png",
       audioUrl: "",
       videoUrl: ""
     }
@@ -141,8 +141,8 @@ const levelDatabase = [
   {
     level: 3,
     title: "除舊換新",
-    summary: "最後的防火牆阻擋了去路，拼湊所有舊線索解開總機密。",
-    clueText: "【機密線索 #03】\n將所有過關獲得的關鍵字組合成最終金鑰。",
+    summary: "防火牆阻擋了去路",
+    clueText: "請靜待社群發布線索",
     passcodes: ["unlock MATRIX999", "MATRIX999"],
     isReleased: false,
     reward: {
@@ -269,7 +269,7 @@ function renderUI() {
   if (!currentData.isReleased) {
     cmdInput.disabled = true;
     executeBtn.disabled = true;
-    cmdInput.placeholder = "系統鎖定：靜待官方社群公布最新線索";
+    cmdInput.placeholder = "系統鎖定：靜待指定社群公布最新線索";
   } else {
     cmdInput.disabled = false;
     executeBtn.disabled = false;
