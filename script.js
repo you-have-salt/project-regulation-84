@@ -112,7 +112,7 @@ const levelDatabase = [
     level: 1,
     title: "黑暗中閃爍的綠光",
     summary: "一台需要授權的電腦，解開終端金鑰以獲取初步權限",
-    clueText: "觀察社群貼文中發布的神秘畫面\n提示：便利貼的英文和虛線是否與畫面有關聯?\n嘗試著由左到右串聯起來吧",
+    clueText: "觀察社群貼文中發布的神秘畫面\n提示：便利貼的英文和上面的黑線是否與畫面有關聯?\n嘗試著由左到右串聯起來吧",
     passcodes: ["unlock 81230", "81230"],
     isReleased: true,
     reward: {
